@@ -1,6 +1,6 @@
 import { toast } from '@/components/ui/sonner';
 
-const ELEVENLABS_API_KEY = 'sk_69945b3dca0a41f83a6a02b6d9627f32672ca6573ecde61b';
+const ELEVENLABS_API_KEY = 'sk_91aca103f909119f7e8188d502840d76013bfa4d39ed7b1a';
 
 type VoiceSettings = {
   stability: number;
