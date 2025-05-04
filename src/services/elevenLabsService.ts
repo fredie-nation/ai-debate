@@ -57,7 +57,7 @@ export const ELEVENLABS_VOICES = {
     defaultRate: 1.2 // Slightly faster than default
   },
   gemini: {
-    id: 'XB0fDUnXU5powFXDhCwa', // Charlotte
+    id: 'AZnzlk1XvdvUeBnXmlld', // Charlotte
     name: 'Charlotte',
     defaultRate: 1.25 // Even slightly faster
   }
