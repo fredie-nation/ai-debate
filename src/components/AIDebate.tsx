@@ -23,10 +23,14 @@ const AIDebate: React.FC = () => {
   const maxRetries = 3;
   const debateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Scroll to bottom of messages
+  // Scroll to bottom when messages change (only for the visible, filtered messages)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    // Use a short timeout to ensure the DOM has updated
+    const timer = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [chatGPTMessages, geminiMessages]);
 
   // Debug helper for monitoring state
   useEffect(() => {
@@ -203,9 +207,14 @@ const AIDebate: React.FC = () => {
     retryCountRef.current = 0;
   };
 
-  // Get chatGPT and Gemini messages
-  const chatGPTMessages = messages.filter(msg => msg.role === 'chatgpt');
-  const geminiMessages = messages.filter(msg => msg.role === 'gemini');
+  // Get chatGPT and Gemini messages - only show the latest 5 messages for each
+  const chatGPTMessages = messages
+    .filter(msg => msg.role === 'chatgpt')
+    .slice(-5); // Only keep the 5 most recent messages
+  
+  const geminiMessages = messages
+    .filter(msg => msg.role === 'gemini')
+    .slice(-5); // Only keep the 5 most recent messages
 
   return (
     <div className="flex flex-col h-full bg-gray-900 text-gray-200">
@@ -249,12 +258,20 @@ const AIDebate: React.FC = () => {
           </div>
           
           <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 pr-2 md:pr-4">
-            {chatGPTMessages.map((msg, idx) => (
-              <div key={idx} className="mb-4 p-3 rounded-lg bg-gray-800 bg-opacity-50 animate-fadeIn">
-                <p className="text-sm md:text-base">{msg.content}</p>
-              </div>
-            ))}
-            {chatGPTMessages.length === 0 && (
+            {chatGPTMessages.length > 0 ? (
+              <>
+                {messages.filter(msg => msg.role === 'chatgpt').length > 2 && (
+                  <div className="text-center text-xs text-gray-500 mb-2">
+                    Showing only latest messages...
+                  </div>
+                )}
+                {chatGPTMessages.map((msg, idx) => (
+                  <div key={idx} className="mb-4 p-3 rounded-lg bg-gray-800 bg-opacity-50 animate-fadeIn">
+                    <p className="text-sm md:text-base">{msg.content}</p>
+                  </div>
+                ))}
+              </>
+            ) : (
               <div className="flex items-center justify-center h-full opacity-50">
                 <p className="text-sm text-center">The debate hasn't started yet</p>
               </div>
@@ -274,12 +291,20 @@ const AIDebate: React.FC = () => {
           </div>
           
           <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 pl-2 md:pl-4">
-            {geminiMessages.map((msg, idx) => (
-              <div key={idx} className="mb-4 p-3 rounded-lg bg-gray-800 bg-opacity-50 animate-fadeIn">
-                <p className="text-sm md:text-base">{msg.content}</p>
-              </div>
-            ))}
-            {geminiMessages.length === 0 && (
+            {geminiMessages.length > 0 ? (
+              <>
+                {messages.filter(msg => msg.role === 'gemini').length > 2 && (
+                  <div className="text-center text-xs text-gray-500 mb-2">
+                    Showing only latest messages...
+                  </div>
+                )}
+                {geminiMessages.map((msg, idx) => (
+                  <div key={idx} className="mb-4 p-3 rounded-lg bg-gray-800 bg-opacity-50 animate-fadeIn">
+                    <p className="text-sm md:text-base">{msg.content}</p>
+                  </div>
+                ))}
+              </>
+            ) : (
               <div className="flex items-center justify-center h-full opacity-50">
                 <p className="text-sm text-center">The debate hasn't started yet</p>
               </div>
