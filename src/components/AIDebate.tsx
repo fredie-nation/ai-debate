@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import AIAvatar from './AIAvatar';
 import { startDebate, continuateDebate, speakText } from '@/services/geminiService';
 import { toast } from '@/components/ui/sonner';
-import { Play, Square } from 'lucide-react';
 
 type AIRole = 'chatgpt' | 'gemini';
 type AIMessage = {
@@ -23,14 +23,10 @@ const AIDebate: React.FC = () => {
   const maxRetries = 3;
   const debateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Scroll to bottom when messages change (only for the visible, filtered messages)
+  // Scroll to bottom of messages
   useEffect(() => {
-    // Use a short timeout to ensure the DOM has updated
-    const timer = setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [chatGPTMessages, geminiMessages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   // Debug helper for monitoring state
   useEffect(() => {
@@ -207,145 +203,78 @@ const AIDebate: React.FC = () => {
     retryCountRef.current = 0;
   };
 
-  // Get chatGPT and Gemini messages - only show the latest 5 messages for each
-  const chatGPTMessages = messages
-    .filter(msg => msg.role === 'chatgpt')
-    .slice(-5); // Only keep the 5 most recent messages
-  
-  const geminiMessages = messages
-    .filter(msg => msg.role === 'gemini')
-    .slice(-5); // Only keep the 5 most recent messages
-
   return (
-    <div className="flex flex-col h-full bg-gray-900 text-gray-200">
-      {/* Header */}
-      <div className="flex justify-between items-center px-4 py-4 md:px-8 md:py-6 border-b border-gray-800 bg-gray-950">
-        <h1 className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-          AI Shadow Duel
-        </h1>
-        <div className="flex gap-3">
+    <div className="flex flex-col h-full">
+      <div className="flex justify-between px-8 py-6 border-b border-gray-800">
+        <h1 className="text-2xl font-bold">AI Shadow Duel: ChatGPT vs Gemini</h1>
+        <div className="flex gap-4">
           {!isDebating ? (
             <Button
               onClick={startNewDebate}
               disabled={isDebating}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full flex items-center gap-2 px-4 py-2"
+              className="bg-gradient-to-r from-chatgpt to-gemini text-white"
             >
-              <Play size={16} /> Start Debate
+              Start Debate
             </Button>
           ) : (
             <Button
               onClick={stopDebate}
               variant="destructive"
-              className="bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center gap-2 px-4 py-2"
             >
-              <Square size={16} /> Stop Debate
+              Stop Debate
             </Button>
           )}
         </div>
       </div>
 
-      {/* Main content area - Desktop: side by side, Mobile: stacked */}
-      <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
-        {/* ChatGPT Section */}
-        <div className="w-full md:w-1/2 flex flex-col p-4 md:p-6 border-b md:border-b-0 md:border-r border-gray-800 bg-gradient-to-b from-gray-900 to-gray-950">
-          <div className="flex flex-col items-center mb-4 md:mb-6">
+      <div className="flex flex-1 overflow-hidden">
+        {/* ChatGPT Side */}
+        <div className="w-1/2 flex flex-col p-6 border-r border-gray-800 chatgpt-shadow">
+          <div className="flex flex-col items-center mb-6">
             <AIAvatar 
               aiType="chatgpt" 
               isSpeaking={speakingAI === 'chatgpt'} 
-              className="h-12 w-12 md:h-16 md:w-16 mb-2 md:mb-4"
+              className="mb-4"
             />
-            <h2 className="text-lg md:text-xl font-bold text-blue-400">ChatGPT</h2>
+            <h2 className="text-xl font-bold text-chatgpt">ChatGPT</h2>
           </div>
           
-          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 pr-2 md:pr-4">
-            {chatGPTMessages.length > 0 ? (
-              <>
-                {messages.filter(msg => msg.role === 'chatgpt').length > 2 && (
-                  <div className="text-center text-xs text-gray-500 mb-2">
-                    Showing only latest messages...
-                  </div>
-                )}
-                {chatGPTMessages.map((msg, idx) => (
-                  <div key={idx} className="mb-4 p-3 rounded-lg bg-gray-800 bg-opacity-50 animate-fadeIn">
-                    <p className="text-sm md:text-base">{msg.content}</p>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-full opacity-50">
-                <p className="text-sm text-center">The debate hasn't started yet</p>
+          <div className="flex-1 overflow-y-auto pr-4">
+            {messages.filter(msg => msg.role === 'chatgpt').map((msg, idx) => (
+              <div key={idx} className="mb-4 fade-in">
+                <p className="text-sm text-left">{msg.content}</p>
               </div>
-            )}
+            ))}
           </div>
         </div>
 
-        {/* Gemini Section */}
-        <div className="w-full md:w-1/2 flex flex-col p-4 md:p-6 bg-gradient-to-b from-gray-900 to-gray-950">
-          <div className="flex flex-col items-center mb-4 md:mb-6">
+        {/* Gemini Side */}
+        <div className="w-1/2 flex flex-col p-6 gemini-shadow">
+          <div className="flex flex-col items-center mb-6">
             <AIAvatar 
               aiType="gemini" 
               isSpeaking={speakingAI === 'gemini'} 
-              className="h-12 w-12 md:h-16 md:w-16 mb-2 md:mb-4"
+              className="mb-4"
             />
-            <h2 className="text-lg md:text-xl font-bold text-purple-400">Gemini</h2>
+            <h2 className="text-xl font-bold text-gemini">Gemini</h2>
           </div>
           
-          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 pl-2 md:pl-4">
-            {geminiMessages.length > 0 ? (
-              <>
-                {messages.filter(msg => msg.role === 'gemini').length > 2 && (
-                  <div className="text-center text-xs text-gray-500 mb-2">
-                    Showing only latest messages...
-                  </div>
-                )}
-                {geminiMessages.map((msg, idx) => (
-                  <div key={idx} className="mb-4 p-3 rounded-lg bg-gray-800 bg-opacity-50 animate-fadeIn">
-                    <p className="text-sm md:text-base">{msg.content}</p>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-full opacity-50">
-                <p className="text-sm text-center">The debate hasn't started yet</p>
+          <div className="flex-1 overflow-y-auto pl-4">
+            {messages.filter(msg => msg.role === 'gemini').map((msg, idx) => (
+              <div key={idx} className="mb-4 fade-in">
+                <p className="text-sm text-left">{msg.content}</p>
               </div>
-            )}
+            ))}
           </div>
         </div>
       </div>
       <div ref={messagesEndRef} />
       
-      {/* Footer */}
-      <div className="p-3 md:p-4 border-t border-gray-800 bg-gray-950 text-center">
-        <p className="text-xs md:text-sm text-gray-400">
-          Watch ChatGPT and Gemini debate technology topics in a heated, no-holds-barred exchange
+      <div className="p-4 border-t border-gray-800 text-center text-sm text-gray-500">
+        <p>
+          AI Shadow Duel: Watch ChatGPT and Gemini debate technology topics in a heated, no-holds-barred exchange
         </p>
       </div>
-
-      {/* Add custom CSS for the animations and effects */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out forwards;
-        }
-        
-        /* Custom scrollbar styling */
-        .scrollbar-thin::-webkit-scrollbar {
-          width: 4px;
-        }
-        
-        .scrollbar-thumb-gray-700::-webkit-scrollbar-thumb {
-          background-color: #374151;
-          border-radius: 4px;
-        }
-        
-        .scrollbar-track-gray-900::-webkit-scrollbar-track {
-          background-color: #111827;
-        }
-      `}</style>
     </div>
   );
 };
