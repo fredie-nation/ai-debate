@@ -50,8 +50,20 @@
     box-shadow: 0 0 20px 5px theme('colors.chatgpt.shadow');
   }
 
+  @media (max-width: 768px) {
+    .chatgpt-shadow {
+      box-shadow: 0 0 10px 2px theme('colors.chatgpt.shadow');
+    }
+  }
+
   .gemini-shadow {
     box-shadow: 0 0 20px 5px theme('colors.gemini.shadow');
+  }
+
+  @media (max-width: 768px) {
+    .gemini-shadow {
+      box-shadow: 0 0 10px 2px theme('colors.gemini.shadow');
+    }
   }
   
   .audio-visualizer {

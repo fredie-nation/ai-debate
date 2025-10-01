@@ -205,14 +205,15 @@ const AIDebate: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex justify-between px-8 py-6 border-b border-gray-800">
-        <h1 className="text-2xl font-bold">AI Shadow Duel: ChatGPT vs Gemini</h1>
-        <div className="flex gap-4">
+      {/* Header - Responsive */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-800">
+        <h1 className="text-lg sm:text-2xl font-bold text-center sm:text-left">AI Shadow Duel: ChatGPT vs Gemini</h1>
+        <div className="flex gap-3 sm:gap-4">
           {!isDebating ? (
             <Button
               onClick={startNewDebate}
               disabled={isDebating}
-              className="bg-gradient-to-r from-chatgpt to-gemini text-white"
+              className="bg-gradient-to-r from-chatgpt to-gemini text-white text-sm sm:text-base px-4 sm:px-6"
             >
               Start Debate
             </Button>
@@ -220,6 +221,7 @@ const AIDebate: React.FC = () => {
             <Button
               onClick={stopDebate}
               variant="destructive"
+              className="text-sm sm:text-base px-4 sm:px-6"
             >
               Stop Debate
             </Button>
@@ -227,51 +229,53 @@ const AIDebate: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      {/* Main Content - Responsive Layout */}
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* ChatGPT Side */}
-        <div className="w-1/2 flex flex-col p-6 border-r border-gray-800 chatgpt-shadow">
-          <div className="flex flex-col items-center mb-6">
-            <AIAvatar 
-              aiType="chatgpt" 
-              isSpeaking={speakingAI === 'chatgpt'} 
-              className="mb-4"
+        <div className="w-full md:w-1/2 flex flex-col p-3 sm:p-6 border-b md:border-b-0 md:border-r border-gray-800 chatgpt-shadow">
+          <div className="flex flex-col items-center mb-3 sm:mb-6">
+            <AIAvatar
+              aiType="chatgpt"
+              isSpeaking={speakingAI === 'chatgpt'}
+              className="mb-2 sm:mb-4 w-16 h-16 sm:w-20 sm:h-20"
             />
-            <h2 className="text-xl font-bold text-chatgpt">ChatGPT</h2>
+            <h2 className="text-base sm:text-xl font-bold text-chatgpt">ChatGPT</h2>
           </div>
-          
-          <div className="flex-1 overflow-y-auto pr-4">
+
+          <div className="flex-1 overflow-y-auto pr-2 sm:pr-4">
             {messages.filter(msg => msg.role === 'chatgpt').map((msg, idx) => (
-              <div key={idx} className="mb-4 fade-in">
-                <p className="text-sm text-left">{msg.content}</p>
+              <div key={idx} className="mb-3 sm:mb-4 fade-in">
+                <p className="text-xs sm:text-sm text-left leading-relaxed">{msg.content}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Gemini Side */}
-        <div className="w-1/2 flex flex-col p-6 gemini-shadow">
-          <div className="flex flex-col items-center mb-6">
-            <AIAvatar 
-              aiType="gemini" 
-              isSpeaking={speakingAI === 'gemini'} 
-              className="mb-4"
+        <div className="w-full md:w-1/2 flex flex-col p-3 sm:p-6 gemini-shadow">
+          <div className="flex flex-col items-center mb-3 sm:mb-6">
+            <AIAvatar
+              aiType="gemini"
+              isSpeaking={speakingAI === 'gemini'}
+              className="mb-2 sm:mb-4 w-16 h-16 sm:w-20 sm:h-20"
             />
-            <h2 className="text-xl font-bold text-gemini">Gemini</h2>
+            <h2 className="text-base sm:text-xl font-bold text-gemini">Gemini</h2>
           </div>
-          
-          <div className="flex-1 overflow-y-auto pl-4">
+
+          <div className="flex-1 overflow-y-auto pl-2 sm:pl-4">
             {messages.filter(msg => msg.role === 'gemini').map((msg, idx) => (
-              <div key={idx} className="mb-4 fade-in">
-                <p className="text-sm text-left">{msg.content}</p>
+              <div key={idx} className="mb-3 sm:mb-4 fade-in">
+                <p className="text-xs sm:text-sm text-left leading-relaxed">{msg.content}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
       <div ref={messagesEndRef} />
-      
-      <div className="p-4 border-t border-gray-800 text-center text-sm text-gray-500">
-        <p>
+
+      {/* Footer - Responsive */}
+      <div className="p-3 sm:p-4 border-t border-gray-800 text-center text-xs sm:text-sm text-gray-500">
+        <p className="px-2">
           AI Shadow Duel: Watch ChatGPT and Gemini debate technology topics in a heated, no-holds-barred exchange
         </p>
       </div>
